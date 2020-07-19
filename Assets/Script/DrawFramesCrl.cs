@@ -86,7 +86,7 @@ public class DrawFramesCrl : ToolsBaseController
                 {
                     for (int k = 0; k < My_LineWidth; k++)
                     {
-                        Debug.Log(framePoint.p1 + "--" + framePoint.p4);
+                        //Debug.Log(framePoint.p1 + "--" + framePoint.p4);
                         GL.Vertex3(list[i].p1.x + k, list[i].p1.y - k, 0);
                         GL.Vertex3(list[i].p2.x + k, list[i].p2.y + k, 0);
 

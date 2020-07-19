@@ -43,7 +43,7 @@ public class GetCamera : MonoBehaviour
         //创建一个Texture2D，用来保存截图，并设置图片的宽高
         Texture2D screenShot = new Texture2D(Mathf.Abs((int)vector4.z), Mathf.Abs((int)vector4.w), TextureFormat.RGB24, false);
         //读取当前屏幕像素
-        screenShot.ReadPixels(new Rect(vector4.x, vector4.y, vector4.z, vector4.w), 0, 0, true);
+        screenShot.ReadPixels(new Rect(Mathf.Abs(vector4.x), Mathf.Abs(vector4.y), Mathf.Abs(vector4.z), Mathf.Abs(vector4.w)), 0, 0, true);
         yield return screenShot;
 
         //储存为字节
@@ -54,17 +54,10 @@ public class GetCamera : MonoBehaviour
         now = System.DateTime.Now;
         filename = string.Format("IMG_{0}{1}{2}_{3}{4}{5}.jpg", now.Year, now.Month, now.Day, now.Hour, now.Minute, now.Second);
         Debug.Log(filename);
-        // UIPanelController._instance.UIWorkTicketPanel.texture = screenShot;
-        // UIPanelController._instance.UIWorkTicketPanel.WirteImageName(filename);
-        // //储存文件到指定路径下
-        // File.WriteAllBytes(MachatronicsStaticDataProtocol.picturePath + "/ " + filename, bytes);
-        // WorkTicketDataManager._Instance.ScreenshotImagePath = MachatronicsStaticDataProtocol.picturePath + "/ " + filename;
-        // Debug.Log("截图完成,已保存至" + MachatronicsStaticDataProtocol.picturePath);
-
-        // ScreenshotToolsCrl.instance.list = new System.Collections.Generic.List<FramePoint>();
-        // UIPanelController._instance.UIWorkTicketPanel.ScreenShotTools.SetActive(false);
-        // StopCoroutine(getTexture());
-        // UIPanelController._instance.UIWorkTicketPanel.ClearScreenshotDrawMark();
-        //  System.Diagnostics.Process.Start("mspaint.exe", "/pt E:\\Photos\\" + filename);//调用画图工具
+        //储存文件到指定路径下
+        File.WriteAllBytes(Application.dataPath + "/Photos/ " + filename, bytes);
+        Debug.Log("截图完成,已保存至" + Application.dataPath + "/Photos");
+        ScreenshotToolsCrl.instance.EndScreenshot();
+         StopCoroutine("getTexture");
     }
 }

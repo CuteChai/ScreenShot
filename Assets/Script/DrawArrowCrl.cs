@@ -44,11 +44,12 @@ public class DrawArrowCrl : ToolsBaseController
                 s = GetNewPoint();
                 //显示的z轴看自己需求赋值，只要在相机前面就行
 
-                Vector2 SpawnPos;
-                RectTransformUtility.ScreenPointToLocalPointInRectangle(ScreenshotToolsCrl.instance.MainCanvas.GetComponent<RectTransform>(), Input.mousePosition, Camera.main, out SpawnPos);
+                //Vector2 SpawnPos;
+               // RectTransformUtility.ScreenPointToLocalPointInRectangle(ScreenshotToolsCrl.instance.MainCanvas.GetComponent<RectTransform>(), Input.mousePosition, Camera.main, out SpawnPos);
+               // Debug.Log(SpawnPos);
                 go = Instantiate(Arrow) as GameObject;
-                go.transform.SetParent(ScreenshotToolsCrl.instance.ScreenShotTools.transform);
-                go.transform.localPosition = new Vector3(SpawnPos.x, SpawnPos.y, 0);
+                go.transform.SetParent(ScreenshotToolsCrl.instance.ScreenshotToolbar.transform);
+                go.transform.position = new Vector3(Input.mousePosition.x, Input.mousePosition.y, 0);
                 go.transform.localRotation = Quaternion.identity;
                 go.transform.localScale = Vector3.one;
                 ArrowObject.Add(go);
@@ -56,15 +57,17 @@ public class DrawArrowCrl : ToolsBaseController
             //拖拽便于确定箭头方向
             if (Input.GetMouseButton(0))
             {
-                trianglePos.tr2 = Camera.main.WorldToScreenPoint(go.transform.GetChild(0).position);
-                trianglePos.tr3 = Camera.main.WorldToScreenPoint(go.transform.GetChild(1).position);
-                Debug.Log(trianglePos.tr2 + "====" + trianglePos.tr3);
+                //trianglePos.tr2 = Camera.main.WorldToScreenPoint(go.transform.GetChild(0).position);
+                //trianglePos.tr3 = Camera.main.WorldToScreenPoint(go.transform.GetChild(1).position);
+                trianglePos.tr2 = go.transform.GetChild(0).position;
+                trianglePos.tr3 = go.transform.GetChild(1).position;
+               // Debug.Log(trianglePos.tr2 + "====" + trianglePos.tr3);
                 trianglePos.vector = trianglePos.tr3 - trianglePos.tr2;
                 e = GetNewPoint();
                 lp = AddLine(lp, s, e, true);
-                Vector2 SpawnPos;
-                RectTransformUtility.ScreenPointToLocalPointInRectangle(ScreenshotToolsCrl.instance.MainCanvas.GetComponent<RectTransform>(), Input.mousePosition, Camera.main, out SpawnPos);
-                go.transform.localPosition = new Vector3(SpawnPos.x, SpawnPos.y, 0);
+                // Vector2 SpawnPos;
+                // RectTransformUtility.ScreenPointToLocalPointInRectangle(ScreenshotToolsCrl.instance.MainCanvas.GetComponent<RectTransform>(), Input.mousePosition, Camera.main, out SpawnPos);
+                go.transform.position = new Vector3(Input.mousePosition.x, Input.mousePosition.y, 0);
                 Vector3 Vangle = lp[lp.Length - 1] - lp[lp.Length - 2];//最后一条线段
                 float angle = Vector3.Angle(Vangle, Vxyz) - 90;//三角箭头绕着Z轴旋转 那么就限制与X轴夹角为旋转角度吧
                 if (Vangle.y > 0)

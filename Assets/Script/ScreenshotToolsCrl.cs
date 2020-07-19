@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UI;
 
 //工具类型
 public enum ScreenShotToolType
@@ -25,32 +26,49 @@ public class ScreenshotToolsCrl : MonoBehaviour
 {
     public static ScreenshotToolsCrl instance = null;
     public Material Frame_Material;                         //线的材质球
-    public FramePoint framePoint;                           //当前正在画的框     
+    public FramePoint framePoint;                           //当前正在画的框
     public List<FramePoint> list = new List<FramePoint>();  //以确定的框
     [Header("线框粗细"), Range(1, 5)]
     public int FrameLineWidth = 2;                               //画框线宽
-    public bool IsOnScreenShot = false;
-    public Canvas MainCanvas;
-    public GameObject ScreenShotTools;
+    public bool IsOnScreenshot = false;
+    public RectTransform MainCanvas;
+    public GameObject ScreenshotToolbar;
+    [SerializeField] ToolsBaseController[] toolsBaseControllers;
+    [SerializeField] Toggle[] ScreenshotTools;
+    [SerializeField] Toggle ScreenshotSwitch;
     Vector3 limitPoint_0;
     Vector3 limitPoint_1;
     Camera sceneCamera;
-    private void Start()
+    bool BeginDraw = true;
+
+    private void Awake()
     {
         instance = this;
+    }
+    private void Start()
+    {
         sceneCamera = Camera.main;
+        transform.GetComponent<ScreenshotToolsCrl>().enabled = false;
+        ScreenshotSwitch.onValueChanged.AddListener((bool value) => { transform.GetComponent<ScreenshotToolsCrl>().enabled = value; if (!value) EndScreenshot(); });
+    }
+    private void OnEnable()
+    {
+        BeginDraw = true;
     }
 
     private void Update()
     {
-        DrawScreenShotFrames();
+        if (BeginDraw)
+        {
+            DrawScreenShotFrames();
+        }
     }
 
     //画截屏区域框
     void DrawScreenShotFrames()
     {
         Vector2 vector = new Vector2(Input.mousePosition.x / ((float)Screen.width), Input.mousePosition.y / ((float)Screen.height));
-        if (IsOnScreenShot == false)
+        if (IsOnScreenshot == false)
         {
             //记录第一个点
             if (Input.GetMouseButtonDown(0))
@@ -75,30 +93,14 @@ public class ScreenshotToolsCrl : MonoBehaviour
                 }
                 list.Add(framePoint);
                 framePoint = new FramePoint();
-                ScreenShotTools.SetActive(true);
-                Vector2 SpawnPos;
-                RectTransformUtility.ScreenPointToLocalPointInRectangle(MainCanvas.GetComponent<RectTransform>(), Input.mousePosition, Camera.main, out SpawnPos);
-
-                Vector2 SpawnPos1;
-                if (!sceneCamera.rect.Contains(vector))
-                {
-                    RectTransformUtility.ScreenPointToLocalPointInRectangle(MainCanvas.GetComponent<RectTransform>(), list[list.Count - 1].p4, Camera.main, out SpawnPos1);
-                   ScreenShotTools.transform.localPosition = new Vector3(SpawnPos1.x - 210, SpawnPos1.y + 60, 0);
-                }
-                else
-                {
-                    if (list[list.Count - 1].p4.y > list[list.Count - 1].p1.y)
-                    {
-                        RectTransformUtility.ScreenPointToLocalPointInRectangle(MainCanvas.GetComponent<RectTransform>(), list[list.Count - 1].p3, Camera.main, out SpawnPos);
-                        ScreenShotTools.transform.localPosition = new Vector3(SpawnPos.x - 210, SpawnPos.y, 0);
-                    }
-                   ScreenShotTools.transform.localPosition = new Vector3(SpawnPos.x - 210, SpawnPos.y, 0);
-                    IsOnScreenShot = true;
-                }
+                ScreenshotToolbar.SetActive(true);
+                ScreenshotToolbar.transform.position = new Vector3(Input.mousePosition.x - 180, Input.mousePosition.y - 30, 0);
+                IsOnScreenshot = true;
                 limitPoint_0 = list[list.Count - 1].p1;
                 limitPoint_1 = list[list.Count - 1].p4;
             }
         }
+        //  Debug.Log(ScreenshotToolbar.transform.localPosition);
     }
 
     public bool LimitDrawArea()
@@ -212,4 +214,49 @@ public class ScreenshotToolsCrl : MonoBehaviour
             GL.PopMatrix();
         }
     }
+
+    public void EndScreenshot()
+    {
+        list = new List<FramePoint>(); //清空确定的点
+        for (int i = 0; i < toolsBaseControllers.Length; i++)
+        {
+            toolsBaseControllers[i].Clear();
+        }
+         for (int i = 0; i < ScreenshotTools.Length; i++)
+        {
+            ScreenshotTools[i].isOn=false;
+        }
+        ScreenshotToolbar.SetActive(false);
+        ScreenshotSwitch.isOn = false;
+        IsOnScreenshot = false;
+    }
+
+    public void LineToggel(bool ison)
+    {
+        toolsBaseControllers[0].BegainDraw = ison;
+    }
+
+    public void ArrowToggel(bool ison)
+    {
+        toolsBaseControllers[1].BegainDraw = ison;
+    }
+    public void FrameToggel(bool ison)
+    {
+        toolsBaseControllers[2].BegainDraw = ison;
+    }
+    public void CircleToggel(bool ison)
+    {
+        toolsBaseControllers[3].BegainDraw = ison;
+    }
+
+    public void ScreenshotOnEnterTrigger()
+    {
+        BeginDraw = false;
+    }
+
+    public void ScreenshotOnExitTrigger()
+    {
+        BeginDraw = true;
+    }
+
 }
